@@ -7,7 +7,6 @@ By Adriel
 
 const SHA256 = require("crypto-js/sha256");
 const prompt = require("prompt-sync")({ sigint: true });
-const util = require("util"); // helps us log nested objects
 
 // Unicoin Block
 class UnicoinBlock {
@@ -22,7 +21,7 @@ class UnicoinBlock {
 
   findBlockHash() {
     return SHA256(
-      this.indx + +this.timestamp + JSON.stringify(this.blockData) + this.nonce
+      this.indx + this.timestamp + JSON.stringify(this.blockData) + this.nonce
     ).toString();
   }
 
@@ -43,9 +42,11 @@ class UnicoinBlock {
 
 // class Unicoin Blockchain
 class UnicoinBlockChain {
-  constructor(levelOfDifficulty = 0) {
+  constructor(levelOfDifficulty = 0, stepsForRaisingDifficulty = 5) {
     this.blockchain = [this.generateGenesisBlock()];
+    this.lastLengthWhereDifficultyWasIncreased = 0; // we want to be increasing difficulty by 1 after every n blocks mined
     this.levelOfDifficulty = levelOfDifficulty;
+    this.stepsForRaisingDifficulty = stepsForRaisingDifficulty; // after how many blocks to we increase the difficulty level
   }
 
   generateGenesisBlock() {
@@ -66,6 +67,25 @@ class UnicoinBlockChain {
 
     // add the block to the blockchain
     this.blockchain.push(newUnicoinBlock);
+
+    if (!this.validateBlockchain()) {
+      console.log("Block denied, clockchain invalid");
+      this.blockchain.pop();
+    } else {
+      console.log("block added");
+
+      // check if we need to increase difficulty
+      const curBlockchainLength = this.blockchain.length;
+      if (
+        curBlockchainLength - this.lastLengthWhereDifficultyWasIncreased >
+        this.stepsForRaisingDifficulty
+      ) {
+        this.levelOfDifficulty += 1;
+        this.lastLengthWhereDifficultyWasIncreased = curBlockchainLength;
+        console.log(`Mining difficulty updated to ${this.levelOfDifficulty}`);
+      }
+      console.log(this.blockchain);
+    }
   }
 
   validateBlockchain() {
@@ -79,7 +99,7 @@ class UnicoinBlockChain {
       }
 
       // block not in its correct position
-      if (curBlock.prevBlockHash !== prevBlock.findBlockHash()) {
+      if (curBlock.prevBlockHash !== prevBlock.blockHash) {
         return false;
       }
     }
@@ -90,13 +110,13 @@ class UnicoinBlockChain {
 }
 
 // RUNNING THE UNICOIN BLOCKCHAIN
-let unicoinBlockChain = new UnicoinBlockChain(3);
+let unicoinBlockChain = new UnicoinBlockChain(1, 2);
 
 console.log("Welcome to the Unicoin Blockchain ......");
 console.log("Start Recording Transactions");
 
 // Terminal Prompt
-counter = 0;
+counter = 1;
 while (true) {
   const sender = prompt("Sender: >");
   const receiver = prompt("Receiver: >");
@@ -106,13 +126,11 @@ while (true) {
     const newBlock = new UnicoinBlock(counter, new Date().getTime(), {
       sender: "Aimable",
       receiver: "Adriel",
-      amounT: 0.00015,
+      amount: 0.00015,
     });
     unicoinBlockChain.addNewBlock(newBlock);
     counter++;
     console.log("-----------");
-    console.log("New Block Successfully Added");
-    console.log(util.inspect(unicoinBlockChain, { depth: null }));
   } else {
     console.log("Incomplete or incorrect transaction data, try again");
   }
