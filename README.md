@@ -8,8 +8,8 @@ A minimal blockchain written in node.js
 2. `npm install`
 3. `npm start`
 
-Try adjusting the level of difficulty used in the proof of work algorithm
-change the value passed in `new UnicoinBlockChain(3)`
+Try adjusting the level of starting difficulty and the number of blocks that must be added before the degree of difficulty increases used in the proof of work algorithm
+change the value passed in `new UnicoinBlockChain(1, 2)`
 
 ## To do
 
