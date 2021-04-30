@@ -1,0 +1,23 @@
+{
+  "name": "unicoin",
+  "version": "1.0.0",
+  "description": "blockchain project",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lonestarx1/blockchain.git"
+  },
+  "author": "Adriel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lonestarx1/blockchain/issues"
+  },
+  "homepage": "https://github.com/lonestarx1/blockchain#readme",
+  "dependencies": {
+    "crypto-js": "^4.0.0",
+    "prompt-sync": "^4.2.0"
+  }
+}
